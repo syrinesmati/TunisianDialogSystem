@@ -1,0 +1,32 @@
+# ─────────────────────────────────────────────────────────────────
+# preprocessing_config.yaml
+# Configuration for notebook 01_text_preprocessing
+# ─────────────────────────────────────────────────────────────────
+
+cleaning:
+  keep_digits: true
+  min_transcript_length: 2
+
+nota:
+  lexicons_dir: "data/lexicons"
+  # Toggle individual rule layers (all default true in NOTANormalizer).
+  # Layers 4-6 are currently disabled because their lexicon TSVs are still
+  # being validated.  Enable each one once its corresponding TSV is confirmed.
+  apply_alef_maqsura:   false  # TODO: enable once alef_maqsura_list.tsv is validated
+  apply_taa_marbuta:    false  # TODO: enable once taa_marbuta_ha_list.tsv is validated
+  apply_waw_plurality:  false  # TODO: enable once waw_exceptions.tsv is validated
+  apply_hamza_drop:     true   # Layer 7: word-initial أإ → ا
+  apply_negation_split: true   # Layer 8: ماقالش → ما قال ش
+  apply_variant_map:    true   # Layer 9: variant collapse table
+  apply_overrides:      true   # Layer 10: hard canonical overrides
+
+code_switch:
+  # 'arabize' | 'keep' | 'remove'
+  policy: "arabize"
+  case_insensitive: true
+
+similarity:
+  min_similarity_score: 80
+
+display:
+  n_examples: 10

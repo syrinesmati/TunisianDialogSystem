@@ -2,7 +2,10 @@ __pycache__/
 *.pyc
 .env
 data/raw/
+asr/data/raw/linto-hf/
 data/processed/
+llm/data/processed/
+llm/data/processed/*.parquet
 checkpoints/
 *.bin
 *.pt

@@ -1,0 +1,20 @@
+# transcript_corrections.tsv
+# Dataset-specific, EDA-discovered transcript patch rules.
+# Format:  bad_string  TAB  corrected_string
+# Lines starting with # are comments and are ignored.
+#
+# Rules are applied as verbatim substring replacements (left to right).
+# Keep this file sorted by the first column for readability.
+# ──────────────────────────────────────────────────────────────────────
+و ہ	وه
+اLي	ايلي
+اتs	
+ايm v	ايم قانا
+الفرحةd	الفرحة
+دارك اتs ليكه و الي حاجة ياسر	ولي حاجة ياسر دارك و اتس لايك
+كيفYou	You
+cاي	س
+60	ستين
+18	ثمنطاش
+11	حداش
+3	ثلاثة

@@ -1,0 +1,25 @@
+# gaf_exceptions.tsv
+# Words in TUN that contain ق but are pronounced /g/ in urban/rural dialects.
+# Source: Zribi et al. (2014) Table 2 + common extensions.
+# CODA rule: KEEP ق — do not replace with a special letter.
+# Format: one word per line (single column).
+# Lines beginning with # are comments.
+#
+# word
+بالقدا
+بقرة
+قالو
+قديم
+قراية
+قربة
+قربيطة
+قرن
+قرود
+قصبة
+قفة
+قلاص
+قلب
+قلعة
+قنبلة
+قيازوز
+منقيالة

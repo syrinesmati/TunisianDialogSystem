@@ -1,0 +1,24 @@
+# coda_word_list.tsv
+# Hard canonical overrides — highest priority in the normalisation pipeline.
+# These are CODA-specified forms that must not be further transformed by rules.
+# Source: Zribi et al. (2014) §5.2.4 Lexical Exceptions.
+# Format: variant TAB canonical
+# Lines beginning with # are comments.
+#
+# variant	canonical
+# ── Pronouns ─────────────────────────────────────────────────────────────────
+# ── Demonstratives ───────────────────────────────────────────────────────────
+# ── Common nouns with canonical CODA forms ───────────────────────────────────
+احنا	احنا
+انا	انا
+انت	انت
+انتي	انتي
+عالسلامة	عالسلامة
+كانطريبرنور	كانطروبرونور
+هاذا	هاذا
+هاذاكه	هاذاكه
+هاذي	هاذي
+هاذيكه	هاذيكه
+هو	هو
+هوما	هوما
+هي	هي

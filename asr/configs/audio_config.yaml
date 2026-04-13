@@ -1,0 +1,58 @@
+# ─────────────────────────────────────────────────────────────────
+# audio_config.yaml
+# Configuration for notebook 02_audio_preprocessing and
+# pipelines/run_audio_pipeline.py
+# ─────────────────────────────────────────────────────────────────
+
+# ── Gap smoothing ─────────────────────────────────────────────────
+# Controls whether and how gaps between consecutive segments in a
+# recording are closed.  These values mirror audit_config.yaml
+# (audio.smoothing) intentionally — keep both in sync.
+smoothing:
+  enabled: false           # set false to skip smoothing entirely
+  small_gap: 0.2          # gaps below this → snap (end = next.start)
+  large_gap: 1.0          # gaps above this → small fixed extension
+  max_extension: 0.3      # seconds added for large gaps
+  fill_ratio: 0.5         # fraction of medium gap added to end
+
+# ── Waveform preprocessing transforms ────────────────────────────
+# Each step can be toggled independently.
+preprocessing:
+  target_sr: 16000        # output sample rate (Hz) — Whisper/wav2vec2 standard
+  do_mono: false          # average channels to mono
+  do_resample: true       # resample to target_sr
+  do_trim: true           # trim leading/trailing silence
+  do_normalize: true      # peak-normalise to normalize_level
+  do_pre_emphasis: true   # first-order high-frequency boost
+
+  # Trim parameters
+  trim_top_db: 30.0       # dB below peak below which frames are silent
+                          # lower = more aggressive trimming (20 = aggressive, 40 = gentle)
+
+  # Peak normalisation
+  normalize_level: 0.95   # target peak amplitude (0.0–1.0); 0.95 = slight headroom
+
+  # Pre-emphasis
+  pre_emphasis_coef: 0.97 # standard value for TTS/ASR (0.95–0.97)
+
+# ── Quality gate ─────────────────────────────────────────────────
+# Segments failing any threshold are written to the manifest with
+# kept=False and a drop_reason string; they are excluded from the
+# Arrow waveform file.
+quality_gate:
+  min_duration_s: 0.5     # drop segments shorter than this
+  max_duration_s: 20.0    # drop segments longer than this
+  min_rms: 0.001          # drop near-silent segments (RMS below threshold)
+  max_silence_ratio: 0.90 # drop segments that are >90% silence
+
+# ── Storage ───────────────────────────────────────────────────────
+storage:
+  kept_only: false         # write only kept segments to Arrow IPC file
+                          # manifest.parquet always contains all rows
+
+# ── Display / sampling ────────────────────────────────────────────
+display:
+  n_spot_check: 5         # number of decoded samples shown in notebook
+  rms_hist_bins: 60       # bins for RMS histogram
+  duration_clip_s: 25     # clip x-axis of duration histogram at this value
+  gap_zoom_cap_s: 3.0     # x-axis cap for the zoomed gap distribution panel

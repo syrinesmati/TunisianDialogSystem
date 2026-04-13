@@ -1,0 +1,32 @@
+# ─────────────────────────────────────────────────────────────────
+# audit_config.yaml
+# Configuration for notebook 00_dataset_audit
+# ─────────────────────────────────────────────────────────────────
+
+audio:
+  # Maximum duration (s) on the x-axis for recording-duration plots
+  max_duration_plot: 300
+
+  # Number of recordings to decode when sampling sample rates
+  sample_rate_n_samples: 500
+
+  # Upper bound (s) for the zoomed gap-distribution panel
+  gap_zoom_cap: 3.0
+
+  # Segment gap smoothing thresholds — used by smooth_segments()
+  smoothing:
+    small_gap: 0.2       # gaps below this → snap end to next start
+    large_gap: 1.0       # gaps above this → fixed extension
+    max_extension: 0.3   # seconds added when gap > large_gap
+    fill_ratio: 0.5      # fraction of medium gap added to end
+
+text:
+  top_k_words: 50
+  min_word_freq: 5
+  char_grid_cols: 20     # columns in the character inventory grid
+
+sampling:
+  # Number of recordings for gap analysis (use len(dataset) for full pass)
+  gap_n_samples: 500
+  # Max scatter-plot points in cross-analysis
+  cross_analysis_max_points: 3000

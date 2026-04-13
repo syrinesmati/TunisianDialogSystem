@@ -1,0 +1,27 @@
+# ─────────────────────────────────────────────────────────────────
+# paths.yaml
+# All file-system paths used across notebooks and pipelines.
+# Every path is relative to PROJECT_ROOT (the asr/ folder).
+# ─────────────────────────────────────────────────────────────────
+
+data:
+  raw: "data/raw/linagora"
+  # Canonical lexicons path — used by both notebooks (via this file) and
+  # run_text_pipeline.py (via preprocessing_config.yaml → nota.lexicons_dir).
+  # Both entries point to the same directory; keep them in sync.
+  lexicons: "data/lexicons"
+  # Dataset-specific transcript patch rules (loaded by cleaning.load_transcript_corrections)
+  transcript_corrections: "data/lexicons/transcript_corrections.tsv"
+
+# Intermediate outputs — one directory per phase
+interim:
+  audio_clean: "data/interim/audio_clean"
+  text_clean:  "data/interim/text_clean"
+
+# Final training-ready data
+processed:
+  final:     "data/processed/final"
+
+outputs:
+  figures: "outputs/figures"
+  reports: "outputs/reports"

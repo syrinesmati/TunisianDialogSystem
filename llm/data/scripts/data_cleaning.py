@@ -129,6 +129,16 @@ def has_consecutive_repeated_word(text: str) -> bool:
     return bool(re.search(r"\b(\w+)\s+\1\b", str(text), flags=re.IGNORECASE))
 
 
+def has_dominant_word_ratio(text: str, threshold: float = 0.5) -> bool:
+    """Return True if the most frequent word exceeds the given ratio of total words."""
+    words = str(text).split()
+    if len(words) < 2:
+        return False
+    counts = Counter(words)
+    max_count = max(counts.values())
+    return (max_count / len(words)) > threshold
+
+
 def remove_numeric_entries(df: pd.DataFrame, text_col: str = "text") -> pd.DataFrame:
     """Remove rows that contain at least one numeric digit."""
     df = df.copy()
@@ -155,6 +165,16 @@ def remove_consecutive_repeated_word_entries(df: pd.DataFrame, text_col: str = "
     """Remove rows where a word appears consecutively at least twice."""
     df = df.copy()
     return df[~df[text_col].astype(str).apply(has_consecutive_repeated_word)]
+
+
+def remove_dominant_word_ratio_entries(
+    df: pd.DataFrame,
+    text_col: str = "text",
+    threshold: float = 0.5,
+) -> pd.DataFrame:
+    """Remove rows where a single word dominates more than `threshold` of the entry."""
+    df = df.copy()
+    return df[~df[text_col].astype(str).apply(lambda x: has_dominant_word_ratio(x, threshold=threshold))]
 
 
 def classify_text_type(text: str) -> str:
@@ -225,8 +245,8 @@ def remove_short_texts(df: pd.DataFrame, min_length: int = 3, text_col: str = "t
     return df[df[text_col].astype(str).apply(len) >= min_length]
 
 
-def remove_small_word_entries(df: pd.DataFrame, text_col: str = "text", min_words: int = 5) -> pd.DataFrame:
-    """Remove rows where text has fewer than min_words words (default: keep 5+ words only)."""
+def remove_small_word_entries(df: pd.DataFrame, text_col: str = "text", min_words: int = 3) -> pd.DataFrame:
+    """Remove rows where text has fewer than min_words words (default: keep 3+ words only)."""
     df = df.copy()
     word_counts = df[text_col].astype(str).apply(lambda x: len(x.split()))
     return df[word_counts >= min_words]
@@ -240,11 +260,14 @@ def keep_fully_arabic_entries(df: pd.DataFrame, text_col: str = "text") -> pd.Da
 
 
 def standardize_text_column(df: pd.DataFrame, text_col: str = "text") -> pd.DataFrame:
-    """Rename any text column to 'text' and keep only that column."""
+    """Rename any text column to 'text' while preserving optional metadata columns."""
     df = df.copy()
     if text_col != "text":
         if text_col in df.columns:
-            df = df[[text_col]].rename(columns={text_col: "text"})
+            keep_cols = [text_col]
+            if "source" in df.columns:
+                keep_cols.append("source")
+            df = df[keep_cols].rename(columns={text_col: "text"})
     return df
 
 
@@ -253,7 +276,8 @@ def full_cleaning_pipeline(
     text_col: str = "text",
     min_char_length: int = 3,
     remove_symbols: bool = True,
-    analyze: bool = True
+    analyze: bool = True,
+    dominant_word_ratio_threshold: float = 0.5,
 ) -> pd.DataFrame:
     """
     Apply complete cleaning pipeline to dataframe.
@@ -302,12 +326,19 @@ def full_cleaning_pipeline(
     # Remove rows with duplicated consecutive words (e.g., سلام سلام)
     df = remove_consecutive_repeated_word_entries(df)
 
+    # Remove rows where one word dominates most of the entry (e.g., >50%)
+    df = remove_dominant_word_ratio_entries(
+        df,
+        text_col="text",
+        threshold=dominant_word_ratio_threshold,
+    )
+
     # Remove duplicates and empty
     df = remove_duplicates(df)
     df = remove_near_duplicates(df, text_col="text")
     df = remove_empty_rows(df)
     df = remove_short_texts(df, min_length=min_char_length)
-    df = remove_small_word_entries(df, min_words=5)
+    df = remove_small_word_entries(df, min_words=3)
     
     # Analyze
     if analyze:

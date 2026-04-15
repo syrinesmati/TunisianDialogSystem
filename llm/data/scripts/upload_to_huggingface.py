@@ -20,7 +20,7 @@ from datetime import datetime
 import pandas as pd
 
 try:
-    from huggingface_hub import HfApi, login, HfFolder
+    from huggingface_hub import HfApi, login, get_token
 except ImportError:
     raise ImportError(
         "Please install huggingface-hub: pip install huggingface-hub"
@@ -72,7 +72,7 @@ def upload_dataset(
             login(token=token, add_to_git_credential_store=False)
         else:
             # Use stored token or prompt for login
-            stored_token = HfFolder.get_token()
+            stored_token = get_token()
             if not stored_token:
                 print("No stored token found. Running login...")
                 login()

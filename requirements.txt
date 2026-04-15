@@ -2,6 +2,7 @@ torch
 torchaudio
 transformers
 datasets
+huggingface-hub
 accelerate
 peft
 trl

@@ -17,6 +17,15 @@ import json
 from typing import List, Dict, Union, Optional
 
 
+def _attach_source(df: pd.DataFrame, source: str) -> pd.DataFrame:
+    """Attach a source label to rows while preserving existing columns."""
+    df = df.copy()
+    if df.empty:
+        return df
+    df["source"] = source
+    return df
+
+
 # ============================================================================
 # INDIVIDUAL DATASET LOADERS
 # ============================================================================
@@ -48,6 +57,7 @@ def load_dialect_of_tunisia_collection() -> pd.DataFrame:
         if "text" not in df.columns:
             df.columns = ["text"]
         
+        df = _attach_source(df, "atakaboudi/Dialect_of_Tunisia-Work_Collection")
         print(f"✅ Loaded Dialect of Tunisia collection: {len(df):,} rows")
         return df
     
@@ -68,6 +78,7 @@ def load_tunisian_msa_parallel_corpus() -> pd.DataFrame:
         if "chunk_text" in df.columns:
             df = df[["chunk_text"]].rename(columns={"chunk_text": "text"})
         
+        df = _attach_source(df, "tunis-ai/tunisian-msa-parallel-corpus")
         print(f"✅ Loaded Tunisian-MSA parallel corpus: {len(df):,} rows")
         return df
     
@@ -141,6 +152,7 @@ def load_linagora_tunisian_derja(
         try:
             ds = load_dataset("linagora/Tunisian_Derja_Dataset", config)
             df_temp = extract_text_from_dataset(ds)
+            df_temp = _attach_source(df_temp, f"linagora/Tunisian_Derja_Dataset::{config}")
             dfs.append(df_temp)
             if verbose:
                 print(f"  ✅ {config}: {len(df_temp):,} rows")

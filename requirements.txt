@@ -17,3 +17,5 @@ librosa
 evaluate
 sentencepiece
 sacrebleu
+pydantic
+chromadb

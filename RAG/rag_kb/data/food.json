@@ -705,7 +705,7 @@
   {
     "id": "food_029",
     "type": "food",
-    "term_arabic": "المحلّبية",
+    "term_arabic": "المهلّبية",
     "term_arabizi": "mahlebiyya",
     "meaning": "حلوى تونسية بيضاء كريمية مصنوعة من الحليب والنشاء أو السميد الرقيق وماء الزهر والسكر",
     "meaning_fr": "Crème de lait tunisienne aromatisée à l'eau de fleur d'oranger",
@@ -753,7 +753,7 @@
   {
     "id": "food_031",
     "type": "food",
-    "term_arabic": "المحمّص بالدبابيش",
+    "term_arabic": "المحمّص بالدبابش",
     "term_arabizi": "mehemmes bil dbabish",
     "meaning": "طبق تونسي من الحمص والفول والعدس المطهوة مع الهريسة والكروية والكبار والثوم",
     "meaning_fr": "Ragoût de légumineuses tunisien aux épices",
@@ -1090,8 +1090,8 @@
   {
     "id": "food_045",
     "type": "food",
-    "term_arabic": "الكسكسي شتوي بالمرجان",
-    "term_arabizi": "couscous chtawi bil merjaan",
+    "term_arabic": "الكسكسي بالمرجان",
+    "term_arabizi": "couscous bil merjaan",
     "meaning": "كسكسي شتوي تونسي بالمرجان وهو نوع من الأسماك المتوسطة الحجم مع الجزر والبطاطا والحمص",
     "meaning_fr": "Couscous d'hiver tunisien au rouget et légumes",
     "example": "الكسكسي بالمرجان في البرد أحسن ما تتمنى، المرق يسخن والسمك يشبع",
@@ -2146,7 +2146,7 @@
   {
     "id": "food_090",
     "type": "food",
-    "term_arabic": "سلطة بلانكيط",
+    "term_arabic": "سلاطة بلانكيط",
     "term_arabizi": "salade blanquette",
     "meaning": "سلطة تونسية تُقدَّم على دوائر خبز الباجيت مغمّسة بالهريسة، محشوة بالبطاطس والتن والفلفل المشوي والزيتون والخضر المخللة",
     "meaning_fr": "Salade tunisienne sur rondelles de baguette à la harissa",
@@ -2167,7 +2167,7 @@
   {
     "id": "food_091",
     "type": "food",
-    "term_arabic": "سلطة بالقرنيط",
+    "term_arabic": "سلاطة بالقرنيط",
     "term_arabizi": "salade bil garnit",
     "meaning": "سلطة من الأخطبوط المسلوق المتبّل بالملح والفلفل الأسود وزيت الزيتون وعصير الحامض والبقدونس",
     "meaning_fr": "Salade de poulpe tunisienne",
@@ -2188,7 +2188,7 @@
   {
     "id": "food_092",
     "type": "food",
-    "term_arabic": "سلطة أمك حورية",
+    "term_arabic": "سلاطة أمك حورية",
     "term_arabizi": "salade ommi houria",
     "meaning": "سلطة الجزر المسلوق والمهروس مع الثوم والهريسة وعصير الحامض وزيت الزيتون والكمون",
     "meaning_fr": "Salade de carottes épicée à la tunisienne, Oum Houria",
@@ -2209,7 +2209,7 @@
   {
     "id": "food_093",
     "type": "food",
-    "term_arabic": "سلطة بالباذنجان",
+    "term_arabic": "سلاطة بالبيتنجان",
     "term_arabizi": "salade bil badenjan",
     "meaning": "سلطة الباذنجان المشوي في الفرن مع الثوم والفلفل الحار وعصير الحامض والتابل والكروية وزيت الزيتون",
     "meaning_fr": "Salade d'aubergines grillées aux épices tunisiennes",
@@ -2230,7 +2230,7 @@
   {
     "id": "food_094",
     "type": "food",
-    "term_arabic": "السلطة المشوية",
+    "term_arabic": "السلاطة المشوية",
     "term_arabizi": "salade mechouia",
     "meaning": "سلطة الخضار المشوية في الفرن من طماطم وفلفل أحمر وأخضر وحار، تُطحن معاً وتُتبَّل بالتن والبيض المسلوق والزيتون والكبار",
     "meaning_fr": "Salade mechouia, salade de légumes grillés tunisienne",
@@ -2335,7 +2335,7 @@
   {
     "id": "food_099",
     "type": "food",
-    "term_arabic": "باذنجان محشو بالبطاطس",
+    "term_arabic": "بيتنجان محشي بالبطاطا",
     "term_arabizi": "badenjan mahshi bil batata",
     "meaning": "باذنجان محشو بخليط البطاطس المقلية والجبن القروبير والبيض المخفوق، يُخبز في الفرن حتى يتحمر",
     "meaning_fr": "Aubergines farcies aux pommes de terre et fromage, cuites au four",
@@ -2356,7 +2356,7 @@
   {
     "id": "food_100",
     "type": "food",
-    "term_arabic": "طجين السلطة المشوية",
+    "term_arabic": "طاجين السلاطة المشوية",
     "term_arabizi": "tajine salade mechouia",
     "meaning": "طجين تونسي بقطع لحم البقر مع خضار مشوية ومطحونة (طماطم وفلفل) وبيض وخبز محمص مطحون وخميرة كيميائية، يُخبز في الفرن",
     "meaning_fr": "Tajine tunisien à la salade mechouia et viande",
@@ -2377,7 +2377,7 @@
   {
     "id": "food_101",
     "type": "food",
-    "term_arabic": "طجين السبانخ",
+    "term_arabic": "طاجين السبناخ",
     "term_arabizi": "tajine sebanegh",
     "meaning": "طجين تونسي بقطع لحم البقر والسبانخ وجبن البارمزان وجبن القروبير والبيض واللوبيا البيضاء، يُخبز في الفرن",
     "meaning_fr": "Tajine tunisien aux épinards, viande et fromage",
@@ -2398,7 +2398,7 @@
   {
     "id": "food_102",
     "type": "food",
-    "term_arabic": "طجين الملسوقة بالدجاج",
+    "term_arabic": "طاجين الملسوقة بالدجاج",
     "term_arabizi": "tajine malsouqa bil djaj",
     "meaning": "طجين تونسي بأوراق الملسوقة محشوة بالدجاج المطهو والجبن والبيض، يُخبز في الفرن ويُقدَّم ذهبياً مقرمشاً",
     "meaning_fr": "Tajine de pastilla au poulet, feuilles de brick farcies au poulet et fromage",
@@ -2461,7 +2461,7 @@
   {
     "id": "food_105",
     "type": "food",
-    "term_arabic": "طجين البطاطس",
+    "term_arabic": "طاجين البطاطا",
     "term_arabizi": "tajine batata",
     "meaning": "طجين تونسي بقطع البطاطس المقلية على طبقتين مع لحم البقر المفروم والبيض وجبن القروبير، يُخبز في الفرن",
     "meaning_fr": "Tajine de pommes de terre à la viande et au fromage",
@@ -2482,7 +2482,7 @@
   {
     "id": "food_106",
     "type": "food",
-    "term_arabic": "الفلفل المحشو",
+    "term_arabic": "الفلفل المحشي",
     "term_arabizi": "felfel mahshi",
     "meaning": "فلفل أخضر وأحمر محشو بالكفتة والحمص المطحون والبيض، يُقلى ثم يُطهى في صالصة الطماطم والهريسة",
     "meaning_fr": "Poivrons farcis à la viande et pois chiches en sauce tomate",
@@ -2545,7 +2545,7 @@
   {
     "id": "food_109",
     "type": "food",
-    "term_arabic": "الكفتة المحشوة بالبيض",
+    "term_arabic": "الكفتة المحشية بالعظم",
     "term_arabizi": "kefta mahshia bil bid",
     "meaning": "رول من الكفتة المفرومة لُفَّت حول بيض مسلوق كاملة وطُهِيَت في الفرن لمدة 30 دقيقة",
     "meaning_fr": "Rôti de kefta farci aux œufs durs, cuit au four",
@@ -2650,8 +2650,8 @@
   {
     "id": "food_114",
     "type": "food",
-    "term_arabic": "فخذ الخروف",
-    "term_arabizi": "fakhd el kharuf",
+    "term_arabic": "فخذ العلوش",
+    "term_arabizi": "fakhd el alouch",
     "meaning": "فخذ خروف كامل مشوي في الفرن مع الثوم والزعتر والزعيترة والكركم والزعفران والزبدة، يُقدَّم مع الأرز والمكسرات",
     "meaning_fr": "Gigot d'agneau rôti au four aux herbes et épices",
     "example": "فخذ الخروف في العيد الكبير هو تقليد لا يُنسى، ريحته تملا الحي كله",
@@ -2671,8 +2671,8 @@
   {
     "id": "food_115",
     "type": "food",
-    "term_arabic": "الأرز الجربي",
-    "term_arabizi": "aruz jerbi",
+    "term_arabic": "الروز الجربي",
+    "term_arabizi": "rouz jerbi",
     "meaning": "أرز جزيرة جربة بالهبرة ولحم البقري والكبد والجلبانة والبقدونس المفروم والتوابل، يُطهى بالبخار في الكسكسي",
     "meaning_fr": "Riz de Djerba à la viande et petits pois, cuit à la vapeur",
     "example": "الأرز الجربي تمييزه ريحة الزعفران والكركم، من أكلته جربة ما ننساهاش",
@@ -2692,8 +2692,8 @@
   {
     "id": "food_116",
     "type": "food",
-    "term_arabic": "الكسكسي بالفواكه الجافة",
-    "term_arabizi": "couscous bil fwaka el jafa",
+    "term_arabic": "الكسكسي بالفاكية",
+    "term_arabizi": "couscous bil fakiya",
     "meaning": "كسكسي تونسي بمرق لحم البقري مع حليب مضاف إليه، يُزيَّن باللوز المقلي والفستق والصنوبر المحمر",
     "meaning_fr": "Couscous au lait, viande et fruits secs grillés",
     "example": "الكسكسي بالفواكه الجافة نوع خاص تلقاه في الأفراح الكبيرة فقط",
@@ -2734,7 +2734,7 @@
   {
     "id": "food_118",
     "type": "food",
-    "term_arabic": "الكسكسي بالكلمار المحشو",
+    "term_arabic": "الكسكسي بالكلمار المحشي",
     "term_arabizi": "couscous bil kalmar el mahshi",
     "meaning": "كسكسي تونسي بسمك الكلمار (الحبار) المحشو بالبرغل والسبانخ وتوابل البيت، في مرق حمراء حارة",
     "meaning_fr": "Couscous aux calamars farcis aux herbes et semoule de blé",

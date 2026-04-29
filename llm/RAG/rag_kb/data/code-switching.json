@@ -44,7 +44,7 @@
   {
     "id": "cs_004",
     "type": "code_switch",
-    "term_arabic": "سكراتار",
+    "term_arabic": "سكريتار",
     "term_arabizi": "sekratar",
     "origin_language": "fr",
     "origin_word": "secrétaire",
@@ -66,7 +66,7 @@
     "id": "cs_005",
     "type": "code_switch",
     "term_arabic": "ڤوندور",
-    "term_arabizi": "fondor",
+    "term_arabizi": "vondor",
     "origin_language": "fr",
     "origin_word": "vendeur",
     "meaning": "البائع في المحل التجاري، مقتبسة من الفرنسية وتُستخدم للوظيفة التجارية",
@@ -149,7 +149,7 @@
   {
     "id": "cs_009",
     "type": "code_switch",
-    "term_arabic": "ڤاتارينار",
+    "term_arabic": "ڤيتيرينار",
     "term_arabizi": "vatarinar",
     "origin_language": "fr",
     "origin_word": "vétérinaire",

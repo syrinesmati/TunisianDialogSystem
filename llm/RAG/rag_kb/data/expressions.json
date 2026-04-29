@@ -40,7 +40,7 @@
   {
     "id": "expr_003",
     "type": "expression",
-    "term_arabic": "والاه",
+    "term_arabic": "واالله",
     "term_arabizi": "wallah",
     "meaning": "والله، تعبير عن القسم أو التأكيد",
     "meaning_fr": "je jure",
@@ -59,7 +59,7 @@
   {
     "id": "expr_004",
     "type": "expression",
-    "term_arabic": "ملقوش",
+    "term_arabic": "ملقاش",
     "term_arabizi": "malkhoosh",
     "meaning": "لم يجد، لا يوجد",
     "meaning_fr": "il n'y a pas",

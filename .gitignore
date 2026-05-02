@@ -6,6 +6,8 @@ asr/data/raw/linto-hf/
 data/processed/
 llm/data/processed/
 llm/data/processed/*.parquet
+llm/sft/data/raw/AHQAD.csv
+llm/sft/data/raw/AHQAD.csv.tmp
 checkpoints/
 *.bin
 *.pt

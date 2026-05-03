@@ -1,0 +1,4 @@
+dataset,n_samples,total_audio_h,WER,CER,RTF,inference_time_s,mean_latency_s,median_latency_s
+labeled_algerian,500,3.9869,0.8715,0.6483,0.1332,1911.68,3.8113,3.8095
+labeled_linagora_cs_arabize,5482,6.0153,0.7787,0.5043,0.3318,7184.24,1.3091,1.0974
+labeled_linagora_raw,5482,6.0153,0.7541,0.4842,0.3427,7421.72,1.3524,1.1339

@@ -2,16 +2,17 @@
 ALL CATEGORIES IN FILTERED_DATA.JSON
 ==================================================
 
-Total unique categories: 8
+Total unique categories: 9
 
 1. advice_guidance (3213 entries)
 2. cultural_knowledge (3576 entries)
 3. emotional_support (555 entries)
 4. everyday_conversation (795 entries)
 5. general_knowledge (1317 entries)
-6. storytelling (703 entries)
-7. student_life (613 entries)
-8. task_oriented (1037 entries)
+6. opinions_recommendations (534 entries)
+7. storytelling (703 entries)
+8. student_life (613 entries)
+9. task_oriented (1037 entries)
 
 ==================================================
 CATEGORY LIST:
@@ -21,6 +22,7 @@ CATEGORY LIST:
 - emotional_support
 - everyday_conversation
 - general_knowledge
+- opinions_recommendations
 - storytelling
 - student_life
 - task_oriented

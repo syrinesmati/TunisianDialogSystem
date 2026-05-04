@@ -15,9 +15,9 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from schemas.expression_schema import ExpressionEntry
-from schemas.proverb_schema import ProverbEntry
-from pipeline.validate_entries import validate_file, print_validation_report
+from RAG.rag_kb.schemas.expression_schema import ExpressionEntry
+from RAG.rag_kb.schemas.proverb_schema import ProverbEntry
+from RAG.rag_kb.pipeline.validate_entries import validate_file, print_validation_report
 
 
 def bulk_import_from_json(

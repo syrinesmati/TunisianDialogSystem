@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 import sys
 
+from RAG.rag_kb.pipeline import print_validation_report, validate_file
+
 # Add package to path
 pkg_root = Path(__file__).parent / "rag_kb"
 sys.path.insert(0, str(pkg_root.parent))
@@ -15,7 +17,7 @@ sys.path.insert(0, str(pkg_root.parent))
 def test_schemas():
     """Test that schemas can be imported and validated"""
     print("\n🧪 Testing Schemas...")
-    from rag_kb.schemas import ExpressionEntry, ProverbEntry
+    from RAG.rag_kb.schemas import ExpressionEntry, ProverbEntry
     
     # Test expression
     expr_data = {
@@ -80,7 +82,7 @@ def test_schemas():
 def test_pipeline():
     """Test pipeline functions"""
     print("\n🧪 Testing Pipeline...")
-    from rag_kb.pipeline import build_embed_text, validate_file, print_validation_report
+    from rag_kb.pipeline import build_embed_text
     
     # Test build_embed_text
     entry = {

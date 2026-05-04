@@ -8,8 +8,8 @@ Bad data = bad AI. This is critical.
 import json
 from pathlib import Path
 from typing import Dict, List, Tuple
-from schemas.expression_schema import ExpressionEntry
-from schemas.proverb_schema import ProverbEntry
+from RAG.rag_kb.schemas.expression_schema import ExpressionEntry
+from RAG.rag_kb.schemas.proverb_schema import ProverbEntry
 
 
 def validate_file(file_path: str) -> Tuple[List[dict], List[Tuple[str, str]]]:

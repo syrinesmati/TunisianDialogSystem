@@ -1,8 +1,8 @@
 {
   "dataset_name": "tunisian_sft_dataset",
   "description": "Tunisian dialect supervised fine-tuning dataset",
-  "total_samples": 31678,
-  "train_samples": 25342,
+  "total_samples": 31676,
+  "train_samples": 25340,
   "test_samples": 6336,
   "languages": [
     "ar_TN",
@@ -10,14 +10,14 @@
   ],
   "task": "supervised_fine_tuning",
   "categories": [
-    "advice_guidance",
-    "general_knowledge",
-    "emotional_support",
-    "task_oriented",
     "cultural_knowledge",
-    "opinions_recommendations",
+    "emotional_support",
+    "advice_guidance",
+    "task_oriented",
     "student_life",
+    "general_knowledge",
     "everyday_conversation",
-    "storytelling"
+    "storytelling",
+    "opinions_recommendations"
   ]
 }

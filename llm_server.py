@@ -10,7 +10,7 @@ from typing import AsyncIterator
 
 import torch
 from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from peft import PeftModel
 from pydantic import BaseModel, Field
 from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
@@ -22,9 +22,9 @@ logging.basicConfig(
 )
 
 BASE_MODEL_ID = os.environ.get("BASE_MODEL_ID", "CohereLabs/aya-expanse-8b")
-ADAPTER_DIR = os.environ.get(
-    "ADAPTER_DIR",
-    str(Path(__file__).resolve().parent / "outputs" / "checkpoints" / "aya-expanse-8b-cpt-tunisian"),
+FINETUNED_MODEL_DIR = os.environ.get(
+    "MODEL_DIR",
+    str(Path(__file__).resolve().parent / "outputs" / "checkpoints" / "aya-expanse-8b-tunisian-sft"),
 )
 
 STOP_MARKER = "<END_TIGANI>"
@@ -56,6 +56,38 @@ SYSTEM_PROMPT = """أنت "التيجاني"، مساعد ذكاء اصطناع�
 
 def _resolve_device_dtype() -> torch.dtype:
     return torch.float16 if torch.cuda.is_available() else torch.float32
+
+
+def _load_model_from_dir(model_dir: Path, base_model_id: str, dtype: torch.dtype):
+    """Load either a merged model directory or a PEFT adapter directory."""
+    tokenizer = AutoTokenizer.from_pretrained(model_dir, trust_remote_code=True)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
+    # If the directory contains a full model config, load it directly.
+    if (model_dir / "config.json").exists():
+        model = AutoModelForCausalLM.from_pretrained(
+            model_dir,
+            device_map="auto",
+            torch_dtype=dtype,
+            trust_remote_code=True,
+        )
+        return tokenizer, model
+
+    # Otherwise, treat it as a PEFT adapter on top of the base model.
+    base_model = AutoModelForCausalLM.from_pretrained(
+        base_model_id,
+        device_map="auto",
+        torch_dtype=dtype,
+        trust_remote_code=True,
+    )
+    model = PeftModel.from_pretrained(
+        base_model,
+        str(model_dir),
+        device_map="auto",
+        local_files_only=True,
+    )
+    return tokenizer, model
 
 
 class GenerateRequest(BaseModel):
@@ -91,47 +123,21 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("🔧 Loading model at startup...")
     
     dtype = _resolve_device_dtype()
-    adapter_path = Path(ADAPTER_DIR)
+    model_path = Path(FINETUNED_MODEL_DIR)
 
     logger.info(f"📦 Base model: {BASE_MODEL_ID}")
-    logger.info(f"📦 Adapter dir: {ADAPTER_DIR}")
+    logger.info(f"📦 Fine-tuned model dir: {FINETUNED_MODEL_DIR}")
     logger.info(f"🎯 Device dtype: {dtype}")
 
-    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL_ID, trust_remote_code=True)
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
+    tokenizer, model = _load_model_from_dir(model_path, BASE_MODEL_ID, dtype)
     logger.info("✅ Tokenizer loaded")
-
-    base_model = AutoModelForCausalLM.from_pretrained(
-        BASE_MODEL_ID,
-        device_map="auto",
-        torch_dtype=dtype,
-        trust_remote_code=True,
-    )
-    logger.info("✅ Base model loaded")
-
-    if adapter_path.exists():
-        logger.info(f"📂 Loading adapter from local path: {adapter_path}")
-        model = PeftModel.from_pretrained(
-            base_model,
-            str(adapter_path),
-            device_map="auto",
-            local_files_only=True,
-        )
-    else:
-        logger.info(f"🌐 Loading adapter from HF Hub: {ADAPTER_DIR}")
-        model = PeftModel.from_pretrained(
-            base_model,
-            ADAPTER_DIR,
-            device_map="auto",
-        )
+    logger.info("✅ Model loaded")
 
     model.eval()
-    logger.info("✅ Adapter loaded and model set to eval mode")
+    logger.info("✅ Model set to eval mode")
 
     app.state.tokenizer = tokenizer
     app.state.model = model
-    app.state.base_model = base_model
     app.state.device_dtype = dtype
     
     logger.info("🎉 Server ready! Waiting for requests...")
@@ -156,13 +162,14 @@ def generate(request: GenerateRequest):
     logger.info(f"📥 Received request: prompt='{request.prompt[:50]}...' max_tokens={request.max_new_tokens}")
 
     def event_stream():
+        """Stream response tokens as SSE data lines."""
         try:
             messages = [
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": request.prompt}
+                {"role": "user", "content": request.prompt},
             ]
-            logger.info(f"📝 Messages before chat template: {len(messages)} messages (system + user)")
-            
+            logger.info("📝 Applying chat template for generation")
+
             inputs = tokenizer.apply_chat_template(
                 messages,
                 add_generation_prompt=True,
@@ -170,8 +177,6 @@ def generate(request: GenerateRequest):
                 return_dict=True,
                 return_tensors="pt",
             )
-            
-            logger.info(f"✅ Chat template applied. Input IDs shape: {inputs['input_ids'].shape}")
 
             try:
                 device = next(model.parameters()).device
@@ -179,15 +184,13 @@ def generate(request: GenerateRequest):
                 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
             inputs = {k: v.to(device) for k, v in inputs.items()}
-            logger.info(f"🎯 Inputs moved to device: {device}")
+            eos_ids = _build_eos_ids(tokenizer)
 
             streamer = TextIteratorStreamer(
                 tokenizer,
                 skip_prompt=True,
                 skip_special_tokens=True,
             )
-
-            eos_ids = _build_eos_ids(tokenizer)
 
             generation_kwargs = {
                 **inputs,
@@ -198,65 +201,42 @@ def generate(request: GenerateRequest):
                 "repetition_penalty": request.repetition_penalty,
                 "do_sample": request.do_sample,
                 "no_repeat_ngram_size": 4,
-                "streamer": streamer,
                 "pad_token_id": tokenizer.eos_token_id,
+                "streamer": streamer,
             }
             if eos_ids is not None:
                 generation_kwargs["eos_token_id"] = eos_ids
 
-            logger.info(f"🚀 Starting generation with kwargs: max_new_tokens={request.max_new_tokens}, temp={request.temperature}")
+            logger.info("🚀 Starting streaming generation")
             
+            # Run generation in background thread
             thread = threading.Thread(target=model.generate, kwargs=generation_kwargs, daemon=True)
             thread.start()
 
+            # Stream tokens as SSE data lines
             full_response = []
-            pending = ""
             yield f"data: {json.dumps({'event': 'start'}, ensure_ascii=False)}\n\n"
 
-            for i, token_text in enumerate(streamer):
-                pending += token_text
-
-                # Stop at explicit marker if present.
-                if STOP_MARKER in pending:
-                    before_marker = pending.split(STOP_MARKER, 1)[0]
+            for token_text in streamer:
+                if STOP_MARKER in token_text:
+                    before_marker = token_text.split(STOP_MARKER, 1)[0]
                     if before_marker:
                         full_response.append(before_marker)
                         yield f"data: {json.dumps({'token': before_marker}, ensure_ascii=False)}\n\n"
-                    logger.info("🛑 Stop marker detected, ending stream early.")
-                    pending = ""
+                    logger.info("🛑 Stop marker detected, ending stream")
                     break
 
-                # Emit everything except a small tail to safely detect marker across chunk boundaries.
-                keep_tail = max(0, len(STOP_MARKER) - 1)
-                if len(pending) > keep_tail:
-                    emit_text = pending[:-keep_tail]
-                    pending = pending[-keep_tail:]
-                    if emit_text:
-                        full_response.append(emit_text)
-                        yield f"data: {json.dumps({'token': emit_text}, ensure_ascii=False)}\n\n"
-
-                if i % 10 == 0:
-                    logger.info(f"📤 Streamed {i} tokens...")
-
-            # Flush any remaining non-marker tail.
-            if pending and STOP_MARKER not in pending:
-                cleaned = pending.replace(STOP_MARKER, "")
-                if cleaned:
-                    full_response.append(cleaned)
-                    yield f"data: {json.dumps({'token': cleaned}, ensure_ascii=False)}\n\n"
+                if token_text:
+                    full_response.append(token_text)
+                    yield f"data: {json.dumps({'token': token_text}, ensure_ascii=False)}\n\n"
 
             thread.join(timeout=0.2)
-            if thread.is_alive():
-                logger.info("ℹ️ Generation thread still running in background after early stop.")
             response_text = "".join(full_response)
-            logger.info(f"✨ Generation complete! Total tokens: {len(full_response)}")
-            logger.info(f"📄 Final response: '{response_text[:100]}...'")
-            
-            yield f"data: {json.dumps({'response': response_text}, ensure_ascii=False)}\n\n"
-            yield f"data: {json.dumps({'event': 'end'}, ensure_ascii=False)}\n\n"
-            
+            logger.info(f"✨ Streaming complete: {len(full_response)} tokens")
+            yield f"data: {json.dumps({'event': 'end', 'response': response_text}, ensure_ascii=False)}\n\n"
+
         except Exception as e:
-            logger.error(f"❌ Error during generation: {e}", exc_info=True)
+            logger.error(f"❌ Error during streaming: {e}", exc_info=True)
             yield f"data: {json.dumps({'error': str(e)}, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(

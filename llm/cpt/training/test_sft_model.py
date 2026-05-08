@@ -59,7 +59,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--prompt",
         type=str,
-        default="عسلامةانت شكونك ؟",
+        default="عالسلامة باللاهي أعطيني الروسات كسكسي بلحم العلوش ؟",
         help="Tunisian prompt to test",
     )
     parser.add_argument(

@@ -1,11 +1,11 @@
 {
-  "original_entries": 11857,
-  "augmented_entries": 31833,
-  "augmentation_ratio": 2.684743189676984,
+  "original_entries": 11856,
+  "augmented_entries": 31832,
+  "augmentation_ratio": 2.684885290148448,
   "entries_with_keyword_augmentations": 1045,
   "entries_with_question_variants": 3958,
   "entries_with_parentheses_variants": 4701,
-  "entries_without_augmentation": 4953,
+  "entries_without_augmentation": 4952,
   "augmentation_types": {
     "original": 1045,
     "translit": 1045,

@@ -29,30 +29,11 @@ FINETUNED_MODEL_DIR = os.environ.get(
 
 STOP_MARKER = "<END_TIGANI>"
 
-SYSTEM_PROMPT = """أنت "التيجاني"، مساعد ذكاء اصطناعي تونسي 100%. تحكي مع العباد بلهجة تونسية دارجة.
-
-### القاعدة الأهم (CRITICAL):
-ممنوع منعاً باتاً تطرح سؤال على روحك وتجاوب عليه. ممنوع تواصل الكلام بعد ما تجاوب المستخدم. بمجرد ما تعطي الإجابة المطلوبة، قص الكلام فوراً (STOP generating).
-
-### القواعد الصارمة:
-1. **اللغة:** احكي بالتونسي الدارجة فقط. ممنوع منعاً باتاً استعمال اللغة العربية الفصحى أو الكلمات "البيضاء". استعمل قاموسنا (مثال: "إي"، "نجم"، "فمة"، "برشة"، "كيما").
-2. **جاوب وقص:** كي تجاوب على قد السؤال، اسكت وديريكت قص الكلام. ممنوع تزيد حرف واحد بعد الإجابة، وممنوع تولد نصوص وهمية أو أخبار قديمة.
-3. **ممنوع الهلوسة:** إذا سألوك على معلومة حينة (طقس، أخبار) أو حاجة ما تعرفهاش، قول ديريكت: "ما عنديش معلومة" أو "ما نعرفش". لا تخترع إجابات ولا تجبد مواضيع سياسية بايتة.
-4. **ادخل في الموضوع:** ما تعاودش سؤال المستخدم، ما تعتذرش بلا سبب، وما تفسرش شكونك إلا إذا سألك. جاوب بوضوح واختصار.
-5. **الشخصية:** أنت ذكي، خفيف روح، ومتربي. تحكي بلهجة تونسية يفهموها التوانسة الكل.
-
-### أمثلة للالتزام بالنمط:
-المستخدم: عالسلامة تحكي تونسي؟
-التيجاني: عالسلامة! إي نعم، نحكي تونسي ونفهمك بالباهي. شنوة حاجتك؟
-
-المستخدم: شنوة الطقس اليوم؟
-التيجاني: سامحني، ما عنديش معلومة حينة على الطقس توة.
-
-المستخدم: شكونك؟
-التيجاني: أنا التيجاني، مساعدك التونسي. موجود هنا باش نعاونك في اللي تحب بالتونسي.
-
-قاعدة تقنية نهائية: كي تكمل إجابتك مباشرة، كتب الرمز هذا وحدو في الآخر: <END_TIGANI>
-"""
+SYSTEM_PROMPT = (
+    'أنت "التيجاني"، مساعد ذكاء اصطناعي تونسي. '
+    'جاوب بالتونسي الدارجة فقط، وبالطول المناسب للسؤال: كان يلزم قصّر، وكان يلزم فسّر أكثر. '
+    'ممنوع الهلوسة أو الخروج على الموضوع.'
+)
 
 def _resolve_device_dtype() -> torch.dtype:
     return torch.float16 if torch.cuda.is_available() else torch.float32
@@ -98,6 +79,29 @@ class GenerateRequest(BaseModel):
     top_p: float = Field(default=0.9, ge=0.0, le=1.0)
     repetition_penalty: float = Field(default=1.2, ge=1.0, le=2.0)
     do_sample: bool = Field(default=False)
+
+
+def _guardrail_response(prompt: str) -> str | None:
+    """Return a fixed compliant answer for high-priority prompts.
+
+    This is used as a safety fallback when model behavior drifts away from the
+    desired persona/instructions.
+    """
+    p = (prompt or "").strip().lower()
+
+    identity_triggers = {
+        "شكونك",
+        "شكون انت",
+        "شكون انتي",
+        "كونك",
+        "من انت",
+        "من انتي",
+        "who are you",
+    }
+    if p in identity_triggers:
+        return "أنا التيجاني، مساعدك التونسي. موجود هنا باش نعاونك في اللي تحب بالتونسي."
+
+    return None
 
 
 def _build_eos_ids(tokenizer) -> list[int] | int | None:
@@ -164,6 +168,14 @@ def generate(request: GenerateRequest):
     def event_stream():
         """Stream response tokens as SSE data lines."""
         try:
+            # Hard guardrails first for critical behavior.
+            guarded = _guardrail_response(request.prompt)
+            if guarded is not None:
+                yield f"data: {json.dumps({'event': 'start'}, ensure_ascii=False)}\n\n"
+                yield f"data: {json.dumps({'token': guarded}, ensure_ascii=False)}\n\n"
+                yield f"data: {json.dumps({'event': 'end', 'response': guarded}, ensure_ascii=False)}\n\n"
+                return
+
             messages = [
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": request.prompt},

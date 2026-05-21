@@ -15,7 +15,7 @@ Usage examples:
 
 For long runs:
     tmux new -s tunisian_sft
-    nohup python llm/cpt/training/sft_train_question_response.py > sft.out 2>&1 &
+     python llm/cpt/training/sft_train_question_response.py > sft.out 2>&1 &
 """
 
 from __future__ import annotations

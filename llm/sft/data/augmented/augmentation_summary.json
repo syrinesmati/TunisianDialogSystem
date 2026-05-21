@@ -1,18 +1,18 @@
 {
-  "original_entries": 11856,
+  "original_entries": 11855,
   "augmented_entries": 31832,
-  "augmentation_ratio": 2.684885290148448,
+  "augmentation_ratio": 2.685111767186841,
   "entries_with_keyword_augmentations": 1045,
-  "entries_with_question_variants": 3958,
-  "entries_with_parentheses_variants": 4701,
-  "entries_without_augmentation": 4952,
+  "entries_with_question_variants": 3957,
+  "entries_with_parentheses_variants": 4702,
+  "entries_without_augmentation": 4951,
   "augmentation_types": {
     "original": 1045,
     "translit": 1045,
     "native": 1045,
-    "question_variant": 3958,
-    "parentheses_variant": 8031,
-    "parentheses_cleaned": 5897
+    "question_variant": 3957,
+    "parentheses_variant": 8032,
+    "parentheses_cleaned": 5898
   },
   "total_keywords_in_mapper": 448,
   "question_words_tracked": [

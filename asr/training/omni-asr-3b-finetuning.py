@@ -358,21 +358,21 @@ def _write_stats_tsv(n_train: int, n_dev: int, n_test: int) -> None:
             "split":          "train",
             "num_samples":    n_train,
             # Rough estimate: average ~5 s per clip
-            "total_audio_s":  n_train * 5,
+            "hours":          (n_train * 5) / 3600.0,
         },
         {
             "corpus":         CORPUS_NAME,
             "language":       LANGUAGE_CODE,
             "split":          "dev",
             "num_samples":    n_dev,
-            "total_audio_s":  n_dev * 5,
+            "hours":          (n_dev * 5) / 3600.0,
         },
         {
             "corpus":         CORPUS_NAME,
             "language":       LANGUAGE_CODE,
             "split":          "test",
             "num_samples":    n_test,
-            "total_audio_s":  n_test * 5,
+            "hours":          (n_test * 5) / 3600.0,
         },
     ]
     with open(STATS_TSV, "w", newline="") as f:
@@ -396,12 +396,49 @@ def write_training_config() -> Path:
     """
     import yaml
 
+    dataset_card = {
+        "name": "example_dataset",
+        "dataset_family": "mixture_parquet_asr_dataset",
+        "dataset_config": {
+            "data": str(PARQUET_ROOT),
+        },
+        "tokenizer_ref": "omniASR_tokenizer_v1",
+    }
+
+    # Update dataset asset card in all likely lookup locations:
+    # 1) cloned repo source tree, 2) installed site-packages package.
+    dataset_card_paths = [
+        OMNIASR_REPO / "src" / "omnilingual_asr" / "cards" / "datasets" / "example_dataset.yaml",
+    ]
+
+    try:
+        import omnilingual_asr
+
+        site_pkg_card = (
+            Path(omnilingual_asr.__file__).resolve().parent
+            / "cards"
+            / "datasets"
+            / "example_dataset.yaml"
+        )
+        dataset_card_paths.append(site_pkg_card)
+    except Exception as exc:
+        log.warning(f"Could not resolve installed omnilingual_asr package path: {exc}")
+
+    for dataset_card_path in dataset_card_paths:
+        try:
+            dataset_card_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(dataset_card_path, "w") as f:
+                yaml.safe_dump(dataset_card, f, sort_keys=False, allow_unicode=True)
+            log.info(f"Updated dataset card → {dataset_card_path}")
+        except Exception as exc:
+            log.warning(f"Could not update dataset card at {dataset_card_path}: {exc}")
+
     config = {
         "model": {
             "name": MODEL_CARD,
         },
         "dataset": {
-            "name": "linto_tn_dataset",
+            "name": "example_dataset",
             "train_split": "train",
             "valid_split": "dev",
             "storage_mode": "MIXTURE_PARQUET",
@@ -486,6 +523,15 @@ def run_training(cfg_path: Path, resume: bool = False) -> None:
 
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Preflight: ensure dataprep actually produced parquet files.
+    parquet_files = list(PARQUET_ROOT.glob("corpus=*/split=*/language=*/*.parquet"))
+    if not parquet_files:
+        log.error(
+            "No parquet files found for training under "
+            f"{PARQUET_ROOT}. Run data preparation first (without --skip-dataprep)."
+        )
+        sys.exit(1)
+
     if not OMNIASR_REPO.exists():
         log.error(
             f"omnilingual-asr repo not found at {OMNIASR_REPO}.\n"
@@ -519,7 +565,11 @@ def run_training(cfg_path: Path, resume: bool = False) -> None:
     log.info("Running: " + " ".join(cmd))
     log.info(f"Working directory: {OMNIASR_REPO}")
 
-    result = subprocess.run(cmd, cwd=OMNIASR_REPO, env={**os.environ})
+    env = {**os.environ}
+    repo_src = str(OMNIASR_REPO / "src")
+    env["PYTHONPATH"] = repo_src + os.pathsep + env.get("PYTHONPATH", "")
+
+    result = subprocess.run(cmd, cwd=OMNIASR_REPO, env=env)
     if result.returncode != 0:
         log.error(f"Training failed with exit code {result.returncode}")
         sys.exit(result.returncode)

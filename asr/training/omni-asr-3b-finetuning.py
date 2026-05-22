@@ -52,13 +52,13 @@ log = logging.getLogger(__name__)
 # ─────────────────────────────────────────────────────────────────────────────
 # Paths – override via environment variables if needed
 # ─────────────────────────────────────────────────────────────────────────────
-BASE_DIR        = Path(os.getenv("FINETUNE_BASE_DIR", "./"))
+BASE_DIR        = Path(os.getenv("FINETUNE_BASE_DIR", "./")).expanduser().resolve()
 DATA_DIR        = BASE_DIR / "data"
 PARQUET_ROOT    = DATA_DIR / "version=0"
 STATS_TSV       = DATA_DIR / "language_distribution_0.tsv"
 CHECKPOINT_DIR  = BASE_DIR / "checkpoints"
 EVAL_DIR        = BASE_DIR / "eval_results"
-OMNIASR_REPO    = Path(os.getenv("OMNIASR_REPO", "./omnilingual-asr"))  # cloned repo
+OMNIASR_REPO    = Path(os.getenv("OMNIASR_REPO", "./omnilingual-asr")).expanduser().resolve()  # cloned repo
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Dataset / model constants
@@ -391,25 +391,14 @@ def write_training_config() -> Path:
     Write a YAML config file for the omnilingual-asr LLM fine-tuning recipe
     tuned for a single NVIDIA GB10 (124 GB VRAM).
 
-    Key choices
-    -----------
-    - model: omniASR_LLM_3B  (~4.4 B params, ~17 GB in FP32 → ~9 GB in BF16)
-    - dtype: bfloat16         (GB10 supports BF16 natively)
-    - FSDP: enabled           (recommended for all LLM variants)
-    - freeze_encoder: 500 steps (stabilise decoder before joint training)
-    - lr: 1e-5                (conservative for fine-tuning)
-    - num_steps: 10_000       (143 k samples → ~1.5 epochs at batch≈14)
-    - grad_accumulation: 2    (effective batch ≈ 28 samples)
-    - max_audio_len: 480_000  (30 s × 16 000)
-    - max_num_elements: 3_840_000  (≈ 8 × 30 s samples per batch)
+    The generated config intentionally mirrors the repository's known-good
+    `llm-finetune.yaml` schema and only sets supported fields.
     """
     import yaml
 
     config = {
         "model": {
             "name": MODEL_CARD,
-            "family": "wav2vec2_llama",
-            "dtype": "bfloat16",
         },
         "dataset": {
             "name": "linto_tn_dataset",
@@ -418,42 +407,28 @@ def write_training_config() -> Path:
             "storage_mode": "MIXTURE_PARQUET",
             "task_mode": "ASR",
             "mixture_parquet_storage_config": {
-                "dataset_path": str(PARQUET_ROOT),
                 "dataset_summary_path": str(STATS_TSV),
                 "beta_corpus": 0.5,
                 "beta_language": 0.5,
-                "fragment_loading": {"cache": True},
+                "fragment_loading": {
+                    "cache": True,
+                },
             },
             "asr_task_config": {
-                "min_audio_len": 8_000,          # 0.5 s
-                "max_audio_len": 480_000,         # 30 s
-                "max_num_elements": 3_840_000,    # controls batch size
-                "batch_shuffle_window": 10,
+                "min_audio_len": 8_000,
+                "max_audio_len": 480_000,
+                "max_num_elements": 3_840_000,
+                "batch_shuffle_window": 1,
                 "normalize_audio": True,
-                "example_shuffle_window": 0,      # full-batch shuffle
+                "example_shuffle_window": 1,
             },
         },
         "tokenizer": {
             "name": "omniASR_tokenizer_v1",
         },
         "optimizer": {
-            "name": "adamw",
             "config": {
                 "lr": 1e-5,
-                "betas": [0.9, 0.98],
-                "weight_decay": 0.01,
-                "eps": 1e-6,
-            },
-        },
-        "lr_scheduler": {
-            "name": "tri_stage",
-            "config": {
-                "num_steps": 10_000,
-                "warmup_steps": 500,
-                "hold_steps": 7_000,
-                "decay_steps": 2_500,
-                "start_lr_scale": 0.01,
-                "final_lr_scale": 0.05,
             },
         },
         "trainer": {
@@ -463,31 +438,27 @@ def write_training_config() -> Path:
                 "version": "v1",
                 "fp32_reduce": False,
             },
-            "freeze_encoder_for_n_steps": 500,   # warm up decoder first
+            "freeze_encoder_for_n_steps": 500,
             "mixed_precision": {
                 "dtype": "torch.bfloat16",
             },
             "grad_accumulation": {
                 "num_batches": 2,
             },
-            "max_gradient_norm": 1.0,
         },
         "regime": {
             "num_steps": 10_000,
-            "validate_after_n_steps": 500,
+            "validate_after_n_steps": 0,
             "validate_every_n_steps": 500,
-            "checkpoint_every_n_steps": 500,
-            "checkpoint_after_n_steps": 500,
+            "checkpoint_every_n_steps": 1000,
             "publish_metrics_every_n_steps": 100,
-            "publish_metrics_after_n_steps": 0,
-            "keep_last_n_checkpoints": 3,
         },
     }
 
     cfg_path = BASE_DIR / "configs" / "llm-finetune-linto-tn.yaml"
     cfg_path.parent.mkdir(parents=True, exist_ok=True)
     with open(cfg_path, "w") as f:
-        yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
+        yaml.safe_dump(config, f, sort_keys=False, allow_unicode=True)
 
     log.info(f"Training config written → {cfg_path}")
     return cfg_path

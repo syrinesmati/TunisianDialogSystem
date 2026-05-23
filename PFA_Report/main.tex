@@ -196,7 +196,6 @@ code-switching with French, English, or Berber is present.
         arrow/.style={->, thick, >=Stealth}
     ]
         \node[module] (asr) {ASR Module \\ \small Transcribe speech};
-        \node[module, right=of asr] (dm) {Dialogue Management \\ \small Intent \& context};
         \node[module, right=of dm] (llm) {LLM Generator \\ \small Tunisian Arabic replies};
         \draw[arrow] (asr) -- (dm);
         \draw[arrow] (dm) -- (llm);
@@ -925,7 +924,7 @@ for low-resource settings and follows a staged methodology.
 %% =====================================================
 
 The proposed pipeline consists of seven stages, beginning with benchmarking open-source LLMs to identify the most suitable base model for Tunisian dialect adaptation.
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \begin{tabular}{c l p{10cm}}
 \toprule
@@ -958,6 +957,48 @@ Each stage addresses a specific challenge of low-resource dialect modeling. Init
     \item SILMA-9B
     \item Aya-Expanse-8B
 \end{itemize}
+
+\subsection{Rationale for Model Selection}
+
+The candidate models above were chosen to cover a range of trade-offs that are important
+for adapting language models to a low-resource, code-switched dialect like Tunisian Arabic.
+Selection criteria include: (1) open-source availability and permissive licensing; (2)
+multilingual coverage and prior evidence of Arabic or dialect competence; (3) model
+scale and the resulting compute / inference cost trade-offs; and (4) community and tooling
+support for fine-tuning and adapter-based adaptation.
+
+\begin{itemize}
+    \item \textbf{Llama-3.2-1B:} A compact member of the Llama family chosen as a
+        lightweight baseline. Its small size enables fast iteration, low-cost
+        experimentation, and early validation of preprocessing, tokenisation, and
+        instruction-tuning pipelines before scaling to larger models.
+
+    \item \textbf{Llama-3-8B:} A mid-sized general-purpose model that balances
+        inference cost with representational capacity. It serves as a realistic
+        production-oriented candidate where latency and cost matter but improved
+        language understanding is still desired.
+
+    \item \textbf{Labess-7B:} Included because it is the only prior work that has
+        undergone continued pretraining specifically on Tunisian dialect data. Labess
+        was built by further pretraining a JAIS-adapted base (\texttt{jais-adapted-7b-chat}),
+        yielding a dialect-specialised initialization that captures Tunisian orthographic
+        variants, code-switching behaviours, and culturally specific lexical items. 
+        
+    \item \textbf{SILMA-9B:} A higher-capacity open model in the candidate set to
+        evaluate whether increased parameters yield measurable improvements in
+        dialectal fidelity and nuanced generation for Tunisian Arabic.
+
+    \item \textbf{Aya-Expanse-8B:} A multilingual model reported to perform well on
+        a variety of languages and dialects. It was included because preliminary
+        observations (and the zero-shot results shown below) indicated stronger
+        baseline behaviour for dialectal adaptation, making it a promising primary
+        candidate for continued pre-training and fine-tuning.
+\end{itemize}
+
+These choices allow us to measure the effect of model scale, language specialization,
+and practical deployment constraints on adaptation quality. The benchmarking stage
+therefore compares both raw zero-shot capability and fine-tuning efficiency across
+these families to select the strongest base for Tunisian-dialect adaptation.
 
 \subsection{Zero-Shot Results}
 

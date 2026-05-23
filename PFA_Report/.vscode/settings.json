@@ -2,32 +2,52 @@
   "latex-workshop.latex.tools": [
     {
       "name": "xelatex",
-      "command": "C:\\Users\\Mediatek\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\xelatex.exe",
+      "command": "C:\\Users\\user\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\xelatex.exe",
       "args": [
         "-synctex=1",
         "-interaction=nonstopmode",
         "-file-line-error",
-        "%DOC%"
-      ]
+        "%DOCFILE%"
+      ],
+      "env": {}
     },
     {
       "name": "bibtex",
-      "command": "C:\\Users\\Mediatek\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\bibtex.exe",
+      "command": "C:\\Users\\user\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\bibtex.exe",
       "args": [
         "%DOCFILE%"
-      ]
+      ],
+      "env": {}
+    },
+    {
+      "name": "biber",
+      "command": "C:\\Users\\user\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\biber.exe",
+      "args": [
+        "%DOCFILE%"
+      ],
+      "env": {}
     }
   ],
   "latex-workshop.latex.recipes": [
     {
-      "name": "xelatex -> bibtex -> xelatex*2",
+      "name": "xelatex→bibtex→xelatex*2",
       "tools": [
         "xelatex",
         "bibtex",
         "xelatex",
         "xelatex"
       ]
+    },
+    {
+      "name": "xelatex→biber→xelatex*2",
+      "tools": [
+        "xelatex",
+        "biber",
+        "xelatex",
+        "xelatex"
+      ]
     }
   ],
-  "latex-workshop.latex.recipe.default": "xelatex -> bibtex -> xelatex*2"
+  "latex-workshop.latex.recipe.default": "xelatex→bibtex→xelatex*2",
+  "latex-workshop.view.pdf.viewer": "tab"
 }

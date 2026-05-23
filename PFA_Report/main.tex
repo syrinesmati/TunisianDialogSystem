@@ -3,37 +3,35 @@
 %% ───────────── PACKAGES ─────────────
 \usepackage{fontspec}   % for custom fonts (XeLaTeX/LuaLaTeX)
 \usepackage{polyglossia} % for multilingual support
-\usepackage[hidelinks]{hyperref}
 \usepackage{float}
-\usepackage{multirow} 
-\usepackage{hyperref}
-% or
+\usepackage{multirow}
 \usepackage{url}
 \usepackage{glossaries}
-\makeglossaries
 \usepackage{booktabs}
-\setmainlanguage{english}
-\setotherlanguages{arabic,french}
 \usepackage{natbib}
-\usepackage{float}
-\newfontfamily\arabicfont[Script=Arabic]{Segoe UI} % Arabic font
-\newcommand{\ar}[1]{\textarabic{#1}} % shortcut for Arabic text
-\makeglossaries
-
-
-\usepackage[margin=2.5cm]{geometry} % ONLY HERE
-% Do NOT load geometry again
-
 \usepackage{graphicx}  % for images
-\usepackage{booktabs}  % tables
 \usepackage{amsmath}   % math
 \usepackage{enumitem}  % lists
 \usepackage{xcolor}    % colors
 \usepackage{tikz}      % diagrams
 \usetikzlibrary{positioning, arrows.meta}
-\usepackage{geometry}
+\usepackage{array}
+\usepackage{caption}
+
+% Geometry MUST be loaded before hyperref
+\usepackage[margin=2.5cm]{geometry}
 \geometry{a4paper, top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm}
 
+% Glossaries setup
+\makeglossaries
+
+% Language and font setup
+\setmainlanguage{english}
+\setotherlanguages{arabic,french}
+\newfontfamily\arabicfont[Script=Arabic]{Segoe UI} % Arabic font
+\newcommand{\ar}[1]{\textarabic{#1}} % shortcut for Arabic text
+
+% Spacing and typography
 \usepackage{setspace}
 \onehalfspacing
 
@@ -45,20 +43,15 @@
 \titlespacing*{\section}{0pt}{12pt}{6pt}
 \titlespacing*{\subsection}{0pt}{10pt}{4pt}
 
-\usepackage{enumitem}
 \setlist{noitemsep, topsep=4pt}
-
-\usepackage{caption}
 \captionsetup{skip=4pt}
 
-\usepackage{hyperref}  % links (last)
-
+% Hyperref MUST be loaded last
+\usepackage[hidelinks]{hyperref}
 
 %% ───────────── DOCUMENT ─────────────
 
-
 \graphicspath{{figures/}}
-\usepackage{array}
 
 
 % ---------- Easy customization ----------
@@ -112,7 +105,7 @@ A Case Study of the Tunisian Dialect with Code-Switched Speech Recognition and L
 \Large
 \textbf{Presented by}\\[1.25em]
 Smati Syrine \\
-Ben Ayed Mohamed Ala \\
+Ben Ayed ALWI \\
 Sassi Yasmine \\
 
 \end{center}
@@ -196,6 +189,7 @@ code-switching with French, English, or Berber is present.
         arrow/.style={->, thick, >=Stealth}
     ]
         \node[module] (asr) {ASR Module \\ \small Transcribe speech};
+        \node[module, right=of asr] (dm) {Dialogue Management \\ \small Intent \& context};
         \node[module, right=of dm] (llm) {LLM Generator \\ \small Tunisian Arabic replies};
         \draw[arrow] (asr) -- (dm);
         \draw[arrow] (dm) -- (llm);

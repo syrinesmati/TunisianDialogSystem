@@ -38,6 +38,7 @@ llm/sft/data/cleaned
 *.mp
 *.fot
 main.pdf
+PFA_report/.vscode
 .vscode/*.code-workspace
 .DS_Store
 __pycache__/

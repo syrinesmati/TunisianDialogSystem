@@ -1,6 +1,11 @@
 """
 Fine-tune w2v-BERT 2.0 as speed-critical alternative.
 
+NOTE (legacy): w2v-BERT 2.0 was an early candidate but was not part of the final
+zero-shot benchmark or fine-tuning stage — facebook/omniASR-LLM-3B was selected
+instead (see asr/training/omni-asr-3b-finetuning.py). Kept here for reference only;
+not part of the current pipeline.
+
 Usage:
     python finetune_w2vbert.py --config configs/w2vbert_finetune_config.yaml
 """

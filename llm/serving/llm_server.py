@@ -22,10 +22,10 @@ logging.basicConfig(
 )
 
 BASE_MODEL_ID = os.environ.get("BASE_MODEL_ID", "CohereLabs/aya-expanse-8b")
-FINETUNED_MODEL_DIR = os.environ.get(
-    "MODEL_DIR",
-    str(Path(__file__).resolve().parent / "outputs" / "checkpoints" / "aya-expanse-8b-tunisian-sft"),
-)
+# Defaults to the published TounsiLM-8b model (CPT + SFT over BASE_MODEL_ID, see
+# PFA report §5.4.1). Override with a local checkpoint/adapter directory to serve
+# a different run instead.
+MODEL_ID_OR_PATH = os.environ.get("MODEL_DIR", "alabenayed/TounsiLM-8b")
 
 STOP_MARKER = "<END_TIGANI>"
 
@@ -39,23 +39,34 @@ def _resolve_device_dtype() -> torch.dtype:
     return torch.float16 if torch.cuda.is_available() else torch.float32
 
 
-def _load_model_from_dir(model_dir: Path, base_model_id: str, dtype: torch.dtype):
-    """Load either a merged model directory or a PEFT adapter directory."""
-    tokenizer = AutoTokenizer.from_pretrained(model_dir, trust_remote_code=True)
+def _load_model(model_id_or_path: str, base_model_id: str, dtype: torch.dtype):
+    """Load the target model.
+
+    ``model_id_or_path`` may be:
+      - a Hugging Face Hub model id (e.g. "alabenayed/TounsiLM-8b"), loaded directly
+        as a full causal LM;
+      - a local directory containing a full merged model (has config.json);
+      - a local directory containing a PEFT/LoRA adapter, loaded on top of
+        ``base_model_id``.
+    """
+    local_path = Path(model_id_or_path)
+    is_local_dir = local_path.exists()
+
+    tokenizer = AutoTokenizer.from_pretrained(model_id_or_path, trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    # If the directory contains a full model config, load it directly.
-    if (model_dir / "config.json").exists():
+    # Hub model id, or a local directory with a full model config: load directly.
+    if not is_local_dir or (local_path / "config.json").exists():
         model = AutoModelForCausalLM.from_pretrained(
-            model_dir,
+            model_id_or_path,
             device_map="auto",
             torch_dtype=dtype,
             trust_remote_code=True,
         )
         return tokenizer, model
 
-    # Otherwise, treat it as a PEFT adapter on top of the base model.
+    # Otherwise, treat the local directory as a PEFT adapter on top of the base model.
     base_model = AutoModelForCausalLM.from_pretrained(
         base_model_id,
         device_map="auto",
@@ -64,7 +75,7 @@ def _load_model_from_dir(model_dir: Path, base_model_id: str, dtype: torch.dtype
     )
     model = PeftModel.from_pretrained(
         base_model,
-        str(model_dir),
+        str(local_path),
         device_map="auto",
         local_files_only=True,
     )
@@ -127,13 +138,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("🔧 Loading model at startup...")
     
     dtype = _resolve_device_dtype()
-    model_path = Path(FINETUNED_MODEL_DIR)
 
     logger.info(f"📦 Base model: {BASE_MODEL_ID}")
-    logger.info(f"📦 Fine-tuned model dir: {FINETUNED_MODEL_DIR}")
+    logger.info(f"📦 Target model: {MODEL_ID_OR_PATH}")
     logger.info(f"🎯 Device dtype: {dtype}")
 
-    tokenizer, model = _load_model_from_dir(model_path, BASE_MODEL_ID, dtype)
+    tokenizer, model = _load_model(MODEL_ID_OR_PATH, BASE_MODEL_ID, dtype)
     logger.info("✅ Tokenizer loaded")
     logger.info("✅ Model loaded")
 

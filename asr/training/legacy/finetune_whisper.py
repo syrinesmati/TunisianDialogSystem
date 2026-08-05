@@ -1,6 +1,12 @@
 """
 Fine-tune Whisper Large v3 on LinTO corpus.
 
+NOTE (legacy): Whisper Large v3 was zero-shot benchmarked (see
+asr/benchmarking-notebooks/) but was NOT selected for fine-tuning — it scored a
+zero-shot WER of 0.9692 on Tunisian Arabic vs. 0.6795 for facebook/omniASR-LLM-3B,
+which was fine-tuned instead (see asr/training/omni-asr-3b-finetuning.py). Kept here
+for reference only; not part of the current pipeline.
+
 Usage:
     python finetune_whisper.py --config configs/whisper_finetune_config.yaml
 """

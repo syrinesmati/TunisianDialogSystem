@@ -1,0 +1,40 @@
+# Aggregated dependencies for the ASR / LLM (CPT+SFT) / RAG knowledge-base code in
+# this repo, derived from the actual imports across tracked .py files. Pin versions
+# yourself if you need a reproducible environment - none are pinned here.
+
+# core ML / training
+torch
+torchaudio
+transformers
+peft
+trl
+bitsandbytes
+datasets
+pyarrow
+numpy
+pandas
+
+# ASR
+jiwer
+librosa
+soundfile
+langdetect
+
+# serving (llm/serving/llm_server.py)
+fastapi
+uvicorn
+pydantic
+
+# utils
+huggingface_hub
+tqdm
+pyyaml
+matplotlib
+
+# Not installable from this file:
+# - omnilingual-asr (used by asr/training/omni-asr-3b-finetuning.py) is installed
+#   from source: pip install git+https://github.com/facebookresearch/omnilingual-asr
+# - vibevoice (used only by
+#   asr/benchmarking-notebooks/zero-shot-benchmarking_V1/09_Vibevoice_Benchmark.py)
+#   is also installed from source, per that script's own docstring:
+#   git clone https://github.com/microsoft/VibeVoice && cd VibeVoice && pip install -e .
